@@ -83,7 +83,7 @@ namespace Ruccho
         private NativeArray<Vertex> vertexBuffer;
         private NativeArray<IndexSegment> indexBuffer;
         private int currentSegments;
-        private Mesh mesh;
+        [NonSerialized] private Mesh mesh = null;
 
         private MeshRenderer meshRenderer;
         private Material material;
@@ -390,6 +390,8 @@ namespace Ruccho
 
                 mesh.SetVertexBufferParams(vertices,
                     new VertexAttributeDescriptor(VertexAttribute.Position, VertexAttributeFormat.Float32, 2),
+                    new VertexAttributeDescriptor(VertexAttribute.Normal, VertexAttributeFormat.Float32, 3),
+                    new VertexAttributeDescriptor(VertexAttribute.Tangent, VertexAttributeFormat.Float32, 4),
                     new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2));
 
                 mesh.SetIndexBufferParams(indexBufferLength * 6, IndexFormat.UInt32);
@@ -412,12 +414,16 @@ namespace Ruccho
         readonly struct Vertex
         {
             public readonly float2 position;
+            public readonly float3 normal;
+            public readonly float4 tangent;
             public readonly float2 texcoord;
 
-            public Vertex(float2 position, float2 texcoord)
+            public Vertex(float2 position, float2 texcoord, float3 normal, float4 tangent)
             {
                 this.position = position;
                 this.texcoord = texcoord;
+                this.normal = normal;
+                this.tangent = tangent;
             }
         }
 
@@ -453,7 +459,7 @@ namespace Ruccho
             {
                 float x = (float)(i / 2) / segments;
                 float y = i % 2 == 0 ? 0 : 1;
-                vertexBuffer[i] = new Vertex(new float2(x - 0.5f, y - 0.5f), new float2(x, y));
+                vertexBuffer[i] = new Vertex(new float2(x - 0.5f, y - 0.5f), new float2(x, y), new float3(0, 0, -1f), new float4(1f, 0, 0, -1f));
             }
         }
 
